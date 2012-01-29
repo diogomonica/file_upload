@@ -33,6 +33,7 @@
           document.getElementById('list').insertBefore(span, null);
         };
       })(f);
+
       reader.readAsBinaryString(f);
       var uploadButton = document.getElementById('upload_button');
       uploadButton.setAttribute("class","btn primary large");
@@ -50,6 +51,7 @@
     var xhr = new XMLHttpRequest();
     xhr.upload.addEventListener('progress', onprogressHandler, false);
     xhr.open('POST', '<%= upload_url %>' ,true);
+    xhr.setRequestHeader("X-File-Name", files[0].name);
     xhr.send(files[0]);
   }
 

@@ -8,15 +8,15 @@
 </script>
 <p><div id="drop_zone">Drop files here</div></p>
 <output id="list"></output>
-<p><a class="btn primary large">Upload &raquo;</a></p>
+<p><a id="upload_button" class="btn primary large disabled">Upload &raquo;</a></p>
 <script>
   var bf = new Blowfish('key');
-
+  var files;
   function handleFileSelect(evt) {
     evt.stopPropagation();
     evt.preventDefault();
 
-    var files = evt.dataTransfer.files; // FileList object.
+    files = evt.dataTransfer.files; // FileList object.
 
     // files is a FileList of File objects. List some properties.
     var output = [];
@@ -34,6 +34,8 @@
         };
       })(f);
       reader.readAsBinaryString(f);
+      var uploadButton = document.getElementById('upload_button');
+      uploadButton.setAttribute("class","btn primary large");
     }
     document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
   }
@@ -44,8 +46,22 @@
     evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
   }
 
+  function doShit() {
+    var xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', onprogressHandler, false);
+    xhr.open('POST', '<%= upload_url %>' ,true);
+    xhr.send(files[0]);
+  }
+
+  function onprogressHandler(evt) {
+    var percent = evt.loaded/evt.total*100;
+    console.log('Upload progress: ' + percent + '%');
+  }
+
   // Setup the dnd listeners.
   var dropZone = document.getElementById('drop_zone');
   dropZone.addEventListener('dragover', handleDragOver, false);
   dropZone.addEventListener('drop', handleFileSelect, false);
+  var uploadButton = document.getElementById('upload_button');
+  uploadButton.addEventListener('click', doShit, false);
 </script>
